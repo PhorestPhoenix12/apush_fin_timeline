@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>U.S. Economic & Financial History Timeline</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- when i want decent fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Rubik:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- mah style shet -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <meta name="description" content="Interactive timeline of key U.S. economic and financial events, with filters, search, and source links." />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1>U.S. Economic & Financial History Timeline</h1>
+      <p class="subtitle">
+        Sources: <em>The American Pageant (16th ed.)</em> and other reputable references.
+      </p>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="./">Home</a>
+        <a href="us_financial_events.json" target="_blank" rel="noopener">JSON Data</a>
+        <a href="https://course-notes.org/us_history/notes/the_american_pageant_16th_edition" target="_blank" rel="noopener">Course-Notes Reference</a>
+        <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" id="app">
+    <section class="controls" aria-label="Timeline controls">
+      <div class="control-row">
+        <label for="search">Search</label>
+        <input id="search" type="search" placeholder="Search events… (e.g., panic, gold, bank)" />
+      </div>
+
+      <div class="control-row">
+        <label for="periodFilter">Period</label>
+        <select id="periodFilter" aria-label="Filter by period">
+          <!-- use js -->
+        </select>
+      </div>
+
+      <div class="control-row">
+        <label for="categoryFilter">Category</label>
+        <select id="categoryFilter" aria-label="Filter by category">
+          <!-- use js -->
+        </select>
+      </div>
+
+      <div class="control-row">
+        <button id="orientationToggle" type="button" aria-pressed="false" title="Toggle vertical/horizontal (T)">
+          Toggle orientation
+        </button>
+        <small id="count" class="result-count" aria-live="polite"></small>
+      </div>
+    </section>
+
+    <section id="timeline" class="vertical" aria-label="Timeline of events">
+      <!-- cards render -->
+      <noscript>
+        <p>Please enable JavaScript to view the interactive timeline.</p>
+      </noscript>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>
+        Built with HTML, CSS, and vanilla JavaScript. Hosted on GitHub Pages.
+        <br />
+        <small>© <span id="year"></span> U.S. Economic & Financial Timeline. Educational use only.</small>
+      </p>
+    </div>
+  </footer>
+
+  <!-- js -->
+  <script src="timeline.js" defer></script>
+  <script>
+    // halp
+    document.addEventListener('DOMContentLoaded', () => {
+      const y = document.getElementById('year');
+      if (y) y.textContent = new Date().getFullYear();
+    });
+  </script>
+</body>
+</html>
