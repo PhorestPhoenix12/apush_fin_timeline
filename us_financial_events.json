@@ -1,0 +1,142 @@
+[
+    {
+        "year": 1791,
+        "title": "First Bank of the United States",
+        "description": "Chartered to stabilize the young nation's credit and improve handling of government finances under Hamilton's financial plan.",
+        "period": "Early Republic",
+        "category": [
+            "financial",
+            "institution"
+        ]
+    },
+    {
+        "year": 1819,
+        "title": "Panic of 1819",
+        "description": "The first major U.S. financial crisis, triggered by speculative lending, falling cotton prices, and credit contraction.",
+        "period": "Early Republic",
+        "category": [
+            "financial",
+            "crisis"
+        ]
+    },
+    {
+        "year": 1837,
+        "title": "Panic of 1837",
+        "description": "A severe financial panic caused by speculative lending and Jackson's dismantling of the Second Bank of the U.S.",
+        "period": "Jacksonian Era",
+        "category": [
+            "financial",
+            "crisis"
+        ]
+    },
+    {
+        "year": 1863,
+        "title": "National Banking Act",
+        "description": "Created a system of national banks and a uniform national currency during the Civil War.",
+        "period": "Civil War Era",
+        "category": [
+            "financial",
+            "law"
+        ]
+    },
+    {
+        "year": 1873,
+        "title": "Panic of 1873",
+        "description": "Financial panic following railroad speculation collapse and the failure of Jay Cooke & Co., leading to a depression.",
+        "period": "Gilded Age",
+        "category": [
+            "financial",
+            "crisis"
+        ]
+    },
+    {
+        "year": 1893,
+        "title": "Panic of 1893",
+        "description": "A major economic depression marked by railroad failures, bank collapses, and high unemployment.",
+        "period": "Gilded Age",
+        "category": [
+            "financial",
+            "crisis"
+        ]
+    },
+    {
+        "year": 1913,
+        "title": "Federal Reserve Act",
+        "description": "Established the Federal Reserve System as the central bank of the United States.",
+        "period": "Progressive Era",
+        "category": [
+            "financial",
+            "institution"
+        ]
+    },
+    {
+        "year": 1929,
+        "title": "Stock Market Crash",
+        "description": "The Wall Street Crash of 1929 triggered the Great Depression, the worst economic downturn in U.S. history.",
+        "period": "Great Depression",
+        "category": [
+            "financial",
+            "crisis"
+        ]
+    },
+    {
+        "year": 1933,
+        "title": "Glass-Steagall Act",
+        "description": "Separated commercial and investment banking and created the FDIC to protect depositors.",
+        "period": "New Deal",
+        "category": [
+            "financial",
+            "law"
+        ]
+    },
+    {
+        "year": 1944,
+        "title": "Bretton Woods Agreement",
+        "description": "Established a new international monetary system with fixed exchange rates and created the IMF and World Bank.",
+        "period": "WWII & Postwar",
+        "category": [
+            "financial",
+            "international"
+        ]
+    },
+    {
+        "year": 1971,
+        "title": "Nixon Ends Gold Standard",
+        "description": "President Nixon ended the direct convertibility of the U.S. dollar to gold, ushering in the era of fiat currency.",
+        "period": "Modern Era",
+        "category": [
+            "financial",
+            "policy"
+        ]
+    },
+    {
+        "year": 1980,
+        "title": "Savings and Loan Crisis",
+        "description": "Over 1,000 savings and loan institutions failed due to risky lending and deregulation, costing taxpayers billions.",
+        "period": "Modern Era",
+        "category": [
+            "financial",
+            "crisis"
+        ]
+    },
+    {
+        "year": 2008,
+        "title": "Global Financial Crisis",
+        "description": "Collapse of housing bubble and major banks sparked the worst global financial crisis since the Great Depression.",
+        "period": "21st Century",
+        "category": [
+            "financial",
+            "crisis"
+        ]
+    },
+    {
+        "year": 2010,
+        "title": "Dodd-Frank Act",
+        "description": "Sweeping financial reform law aimed at preventing another financial crisis, increasing oversight of Wall Street.",
+        "period": "21st Century",
+        "category": [
+            "financial",
+            "law"
+        ]
+    }
+]
