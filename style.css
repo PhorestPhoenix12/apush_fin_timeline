@@ -419,3 +419,99 @@ button:focus {
   background: color-mix(in srgb, var(--primary) 40%, var(--border));
   border-radius: 999px;
 }
+
+
+
+
+
+
+/* === Ribbon rail + ticks + card positioning (append to end) === */
+
+/* use ribbon layout space + disable the old spine */
+#timeline.horizontal {
+  position: relative;
+  padding-top: 110px;      /* room for top cards */
+  padding-bottom: 130px;   /* room for bottom cards */
+  min-height: 420px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+}
+#timeline.horizontal::before { content: none; } /* kill prior horizontal spine */
+
+/* the rail itself */
+.timeline-rail {
+  position: sticky;        /* stays in view while scrolling */
+  top: 140px;              /* tweak as needed vs header height */
+  height: 38px;
+  margin: 0 var(--sp-6);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--primary) 10%, var(--surface)) 0 120px,
+      color-mix(in srgb, var(--primary) 16%, var(--surface)) 120px 240px
+    ),
+    var(--surface);
+  box-shadow: var(--shadow);
+  z-index: 2;
+}
+
+/* round year nodes on the rail */
+.year-tick {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--tick-color, var(--accent));
+  border: 3px solid #fff;
+  box-shadow: 0 1px 6px rgba(0,0,0,.18);
+  z-index: 3;
+}
+
+/* cards float above/below rail, aligned by --pos (0–100%) */
+#timeline.horizontal .event-card {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: min(520px, 42vw);
+  transform: translateX(calc(var(--pos) - 50%));
+  grid-template-columns: 1fr;   /* hide the node column */
+  padding: var(--sp-5);
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  z-index: 1;
+}
+#timeline.horizontal .event-node { display: none; }
+
+#timeline.horizontal .event-card.above { top: 0;  margin-top: var(--sp-2); }
+#timeline.horizontal .event-card.below { bottom: 0; margin-bottom: var(--sp-2); }
+
+/* dotted connector from card to rail */
+#timeline.horizontal .event-card::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 2px; height: 72px;
+  transform: translateX(-50%);
+  background: repeating-linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--text) 35%, transparent) 0 6px,
+    transparent 6px 12px
+  );
+  opacity: .7;
+}
+#timeline.horizontal .event-card.above::before { bottom: -72px; }
+#timeline.horizontal .event-card.below::before { top: -72px; }
+
+/* small-screen tweaks */
+@media (max-width: 600px) {
+  #timeline.horizontal .event-card { width: 88vw; }
+  #timeline.horizontal .event-card::before { height: 48px; }
+  .timeline-rail { top: 120px; }
+}
+
+
+
