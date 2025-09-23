@@ -13,11 +13,25 @@
     policy: '📜',
     economic: '📊'
   };
+  const ERA_COLORS = {
+    "Colonial": "#C05C5C",
+    "Early Republic": "#D38C3A",
+    "Jacksonian Era": "#E0B63F",
+    "Civil War Era": "#B18C5A",
+    "Gilded Age": "#E38E2A",
+    "Progressive Era": "#6CA46C",
+    "Great Depression": "#4F77C8",
+    "New Deal": "#3F6BB5",
+    "WWII & Postwar": "#5AA0D6",
+    "Modern Era": "#7B7B9C",
+    "21st Century": "#5C7C7D"
+};
+
 
   // ---- State ----
   let ALL_EVENTS = [];
   let VISIBLE_EVENTS = [];
-  let ORIENTATION = 'vertical'; // 'vertical' | 'horizontal'
+  let ORIENTATION = 'horizontal'; // 'vertical' | 'horizontal'
 
   // ---- DOM ----
   const $timeline = document.getElementById('timeline');
@@ -64,55 +78,86 @@
     // orientation class on container
     $timeline.classList.toggle('horizontal', ORIENTATION === 'horizontal');
     $timeline.classList.toggle('vertical', ORIENTATION === 'vertical');
-
+  
     // clear
     $timeline.innerHTML = '';
-
-    // sort by year asc
+  
+    // sort visible events by year asc
     const sorted = [...VISIBLE_EVENTS].sort((a, b) => (a.year ?? 0) - (b.year ?? 0));
-
-    // build fragment
+    setCount(sorted.length);
+  
+    // handle empty state
+    if (sorted.length === 0) {
+      $timeline.innerHTML = `<p class="result-count">No events match your filters.</p>`;
+      return;
+    }
+  
+    // create rail (must exist before ticks/cards)
+    const rail = document.createElement('div');
+    rail.className = 'timeline-rail';
+    $timeline.appendChild(rail);
+  
+    // compute min/max years for positioning
+    const years = sorted.map(e => e.year).filter(y => typeof y === 'number' && !Number.isNaN(y));
+    const minY = Math.min(...years);
+    const maxY = Math.max(...years);
+    const span = Math.max(1, maxY - minY);
+  
+    // build ticks + cards
     const frag = document.createDocumentFragment();
-
-    sorted.forEach(ev => {
+  
+    sorted.forEach((ev, i) => {
+      const pos = ((ev.year - minY) / span) * 100; // 0–100%
+  
+      // --- tick on the rail
+      const tick = document.createElement('div');
+      tick.className = 'year-tick';
+      tick.style.left = `${pos}%`;
+      tick.title = ev.year ?? '';
+      tick.style.setProperty('--tick-color', ERA_COLORS[ev.period] || 'var(--primary)');
+      rail.appendChild(tick);
+  
+      // --- event card
       const card = document.createElement('article');
       card.className = 'event-card';
-
-      // left “node/spine” marker
+      // for horizontal layout we position by CSS var; vertical layout ignores it
+      card.style.setProperty('--pos', `${pos}%`);
+      if (ORIENTATION === 'horizontal') {
+        card.classList.add(i % 2 ? 'above' : 'below'); // alternate top/bottom
+      }
+  
+      // optional node (used by vertical view)
       const node = document.createElement('div');
       node.className = 'event-node';
       node.title = ev.year || '';
       card.appendChild(node);
-
-      // content
+  
       const wrap = document.createElement('div');
       wrap.className = 'event-content';
-
+  
       const header = document.createElement('header');
       header.className = 'event-header';
-
+  
       const year = document.createElement('div');
       year.className = 'event-year';
       year.textContent = ev.year ?? '';
-
+  
       const title = document.createElement('h3');
       title.className = 'event-title';
       title.textContent = ev.title || 'Untitled event';
-
+  
       header.appendChild(year);
       header.appendChild(title);
-
-      // badges row
+  
       const badges = document.createElement('div');
       badges.className = 'event-badges';
-
+  
       if (ev.period) {
         const b = document.createElement('span');
         b.className = 'badge period';
         b.textContent = ev.period;
         badges.appendChild(b);
       }
-
       if (Array.isArray(ev.category)) {
         ev.category.forEach(c => {
           const b = document.createElement('span');
@@ -121,14 +166,13 @@
           badges.appendChild(b);
         });
       }
-
+  
       const desc = document.createElement('p');
       desc.className = 'event-desc';
       desc.textContent = ev.description || '';
-
+  
       const actions = document.createElement('div');
       actions.className = 'event-actions';
-
       if (ev.link) {
         const a = document.createElement('a');
         a.href = ev.link;
@@ -138,20 +182,21 @@
         a.textContent = 'View source';
         actions.appendChild(a);
       }
-
+  
       wrap.appendChild(header);
       wrap.appendChild(badges);
       wrap.appendChild(desc);
       if (actions.childNodes.length) wrap.appendChild(actions);
-
+  
       card.appendChild(wrap);
       frag.appendChild(card);
     });
-
+  
     $timeline.appendChild(frag);
-    setCount(sorted.length);
   }
 
+
+  
   // ---- Filters ----
   function applyFilters() {
     const q = $search?.value?.trim() || '';
@@ -198,7 +243,7 @@
     const q = usp.get('q') || '';
     const p = usp.get('p') || 'all';
     const c = usp.get('c') || 'all';
-    const o = usp.get('o') || 'vertical';
+    const o = usp.get('o') || 'horizontal';
 
     if ($search) $search.value = q;
     if ($period) $period.value = p;
