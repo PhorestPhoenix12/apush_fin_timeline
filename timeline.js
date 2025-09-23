@@ -1,5 +1,4 @@
-/* =========  TIMELINE APP (vanilla JS)  =========
-*/
+/* =========  TIMELINE APP (vanilla JS)  ========= */
 
 (() => {
   // ---- Config ----
@@ -25,8 +24,7 @@
     "WWII & Postwar": "#5AA0D6",
     "Modern Era": "#7B7B9C",
     "21st Century": "#5C7C7D"
-};
-
+  };
 
   // ---- State ----
   let ALL_EVENTS = [];
@@ -45,9 +43,7 @@
   const debounce = (fn, ms = 200) => {
     let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
   };
-
   const unique = arr => [...new Set(arr)].sort((a, b) => a.localeCompare(b));
-
   const norm = s => (s || '').toString().toLowerCase();
 
   const matchesSearch = (ev, q) => {
@@ -61,142 +57,157 @@
       String(ev.year).includes(s)
     );
   };
-
-  const matchesPeriod = (ev, p) => !p || p === 'all' ? true : ev.period === p;
-
+  const matchesPeriod = (ev, p) => (!p || p === 'all') ? true : ev.period === p;
   const matchesCategory = (ev, c) => {
     if (!c || c === 'all') return true;
     if (!Array.isArray(ev.category)) return false;
-    // allow filtering for single category or a special "financial-only" convenience
     return ev.category.includes(c);
   };
-
   const setCount = n => { if ($count) $count.textContent = `${n} events`; };
 
   // ---- Rendering ----
   function render() {
-    // orientation class on container
+    // orientation classes
     $timeline.classList.toggle('horizontal', ORIENTATION === 'horizontal');
     $timeline.classList.toggle('vertical', ORIENTATION === 'vertical');
-  
-    // clear
+
+    // clear container
     $timeline.innerHTML = '';
-  
-    // sort visible events by year asc
+
+    // sort
     const sorted = [...VISIBLE_EVENTS].sort((a, b) => (a.year ?? 0) - (b.year ?? 0));
     setCount(sorted.length);
-  
-    // handle empty state
+
+    // empty state
     if (sorted.length === 0) {
       $timeline.innerHTML = `<p class="result-count">No events match your filters.</p>`;
       return;
     }
-  
+
     // create rail (must exist before ticks/cards)
     const rail = document.createElement('div');
     rail.className = 'timeline-rail';
     $timeline.appendChild(rail);
-  
-    // compute min/max years for positioning
+
+    // compute min/max for positions
     const years = sorted.map(e => e.year).filter(y => typeof y === 'number' && !Number.isNaN(y));
     const minY = Math.min(...years);
     const maxY = Math.max(...years);
     const span = Math.max(1, maxY - minY);
-  
-    // build ticks + cards
+
+    // if no valid numeric years, just render a simple list (no rail positioning)
+    if (!years.length || !Number.isFinite(minY) || !Number.isFinite(maxY)) {
+      const fragOnly = document.createDocumentFragment();
+      sorted.forEach(ev => {
+        const card = buildCard(ev);
+        fragOnly.appendChild(card);
+      });
+      $timeline.appendChild(fragOnly);
+      return;
+    }
+
+    // build ticks + cards together so they align
     const frag = document.createDocumentFragment();
-  
+
     sorted.forEach((ev, i) => {
-      const pos = ((ev.year - minY) / span) * 100; // 0–100%
-  
+      // % along the rail
+      let pos = ((ev.year - minY) / span) * 100;
+      if (!Number.isFinite(pos)) pos = (i / Math.max(1, sorted.length - 1)) * 100;
+
       // --- tick on the rail
       const tick = document.createElement('div');
       tick.className = 'year-tick';
       tick.style.left = `${pos}%`;
       tick.title = ev.year ?? '';
       tick.style.setProperty('--tick-color', ERA_COLORS[ev.period] || 'var(--primary)');
+      tick.setAttribute('role', 'img');
+      tick.setAttribute('aria-label', `Year ${ev.year}`);
       rail.appendChild(tick);
-  
+
       // --- event card
-      const card = document.createElement('article');
-      card.className = 'event-card';
-      // for horizontal layout we position by CSS var; vertical layout ignores it
+      const card = buildCard(ev);
+      // for horizontal layout we position by CSS var; vertical ignores it
       card.style.setProperty('--pos', `${pos}%`);
       if (ORIENTATION === 'horizontal') {
-        card.classList.add(i % 2 ? 'above' : 'below'); // alternate top/bottom
+        card.classList.add(i % 2 ? 'above' : 'below'); // alternate placement
       }
-  
-      // optional node (used by vertical view)
-      const node = document.createElement('div');
-      node.className = 'event-node';
-      node.title = ev.year || '';
-      card.appendChild(node);
-  
-      const wrap = document.createElement('div');
-      wrap.className = 'event-content';
-  
-      const header = document.createElement('header');
-      header.className = 'event-header';
-  
-      const year = document.createElement('div');
-      year.className = 'event-year';
-      year.textContent = ev.year ?? '';
-  
-      const title = document.createElement('h3');
-      title.className = 'event-title';
-      title.textContent = ev.title || 'Untitled event';
-  
-      header.appendChild(year);
-      header.appendChild(title);
-  
-      const badges = document.createElement('div');
-      badges.className = 'event-badges';
-  
-      if (ev.period) {
-        const b = document.createElement('span');
-        b.className = 'badge period';
-        b.textContent = ev.period;
-        badges.appendChild(b);
-      }
-      if (Array.isArray(ev.category)) {
-        ev.category.forEach(c => {
-          const b = document.createElement('span');
-          b.className = 'badge category';
-          b.textContent = `${ICONS[c] || '🔖'} ${c}`;
-          badges.appendChild(b);
-        });
-      }
-  
-      const desc = document.createElement('p');
-      desc.className = 'event-desc';
-      desc.textContent = ev.description || '';
-  
-      const actions = document.createElement('div');
-      actions.className = 'event-actions';
-      if (ev.link) {
-        const a = document.createElement('a');
-        a.href = ev.link;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        a.className = 'event-link';
-        a.textContent = 'View source';
-        actions.appendChild(a);
-      }
-  
-      wrap.appendChild(header);
-      wrap.appendChild(badges);
-      wrap.appendChild(desc);
-      if (actions.childNodes.length) wrap.appendChild(actions);
-  
-      card.appendChild(wrap);
       frag.appendChild(card);
     });
-  
+
     $timeline.appendChild(frag);
   }
 
+  // build a card DOM node from an event
+  function buildCard(ev) {
+    const card = document.createElement('article');
+    card.className = 'event-card';
 
-  
+    // node (used by vertical layout; hidden in horizontal)
+    const node = document.createElement('div');
+    node.className = 'event-node';
+    node.title = ev.year || '';
+    card.appendChild(node);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'event-content';
+
+    const header = document.createElement('header');
+    header.className = 'event-header';
+
+    const year = document.createElement('div');
+    year.className = 'event-year';
+    year.textContent = ev.year ?? '';
+
+    const title = document.createElement('h3');
+    title.className = 'event-title';
+    title.textContent = ev.title || 'Untitled event';
+
+    header.appendChild(year);
+    header.appendChild(title);
+
+    const badges = document.createElement('div');
+    badges.className = 'event-badges';
+
+    if (ev.period) {
+      const b = document.createElement('span');
+      b.className = 'badge period';
+      b.textContent = ev.period;
+      badges.appendChild(b);
+    }
+    if (Array.isArray(ev.category)) {
+      ev.category.forEach(c => {
+        const b = document.createElement('span');
+        b.className = 'badge category';
+        b.textContent = `${ICONS[c] || '🔖'} ${c}`;
+        badges.appendChild(b);
+      });
+    }
+
+    const desc = document.createElement('p');
+    desc.className = 'event-desc';
+    desc.textContent = ev.description || '';
+
+    const actions = document.createElement('div');
+    actions.className = 'event-actions';
+    if (ev.link) {
+      const a = document.createElement('a');
+      a.href = ev.link;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.className = 'event-link';
+      a.textContent = 'View source';
+      actions.appendChild(a);
+    }
+
+    wrap.appendChild(header);
+    wrap.appendChild(badges);
+    wrap.appendChild(desc);
+    if (actions.childNodes.length) wrap.appendChild(actions);
+
+    card.appendChild(wrap);
+    return card;
+  }
+
   // ---- Filters ----
   function applyFilters() {
     const q = $search?.value?.trim() || '';
@@ -220,14 +231,13 @@
       $period.innerHTML = `<option value="all">All periods</option>` +
         periods.map(p => `<option value="${p}">${p}</option>`).join('');
     }
-
     if ($category) {
       $category.innerHTML = `<option value="all">All categories</option>` +
         categories.map(c => `<option value="${c}">${c}</option>`).join('');
     }
   }
 
-  // ---- URL state (so filters are shareable) ----
+  // ---- URL state (shareable) ----
   function updateURLState({ q, p, c, o }) {
     const usp = new URLSearchParams(window.location.search);
     if (q) usp.set('q', q); else usp.delete('q');
@@ -243,12 +253,15 @@
     const q = usp.get('q') || '';
     const p = usp.get('p') || 'all';
     const c = usp.get('c') || 'all';
-    const o = usp.get('o') || 'horizontal';
+    const o = usp.get('o') || 'horizontal'; // default to horizontal
 
     if ($search) $search.value = q;
     if ($period) $period.value = p;
     if ($category) $category.value = c;
     ORIENTATION = o === 'horizontal' ? 'horizontal' : 'vertical';
+
+    // reflect pressed state on the toggle button
+    if ($toggle) $toggle.setAttribute('aria-pressed', ORIENTATION === 'horizontal' ? 'true' : 'false');
   }
 
   // ---- Orientation toggle ----
@@ -265,9 +278,9 @@
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
 
-      // Normalize fields & add default link placeholder if needed
+      // normalize fields
       ALL_EVENTS = data.map(e => ({
-        year: e.year ?? null,
+        year: typeof e.year === 'number' ? e.year : Number(e.year),
         title: e.title ?? '',
         description: e.description ?? '',
         period: e.period ?? '',
@@ -285,7 +298,7 @@
       if ($category) $category.addEventListener('change', applyFilters);
       if ($toggle) $toggle.addEventListener('click', toggleOrientation);
 
-      // nice-to-have: keyboard toggle (T)
+      // keyboard toggle (T)
       document.addEventListener('keydown', (e) => {
         if (e.key.toLowerCase() === 't') toggleOrientation();
       });
